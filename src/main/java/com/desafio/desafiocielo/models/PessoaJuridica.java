@@ -1,5 +1,7 @@
 package com.desafio.desafiocielo.models;
 
+import com.desafio.desafiocielo.models.enums.PessoaStatus;
+import com.desafio.desafiocielo.models.enums.PessoaType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.validation.constraints.NotBlank;
@@ -18,6 +20,17 @@ public class PessoaJuridica extends Pessoa implements Serializable {
     @Size(max = 50)
     @NotBlank
     private String razaoSocial;
+
+    public PessoaJuridica(String name, String cpf, int mcc, String email, String cnpj, String razaoSocial, String pessoaTipo, String pessoaStatus) {
+        super(name, cpf, mcc, email, pessoaTipo, pessoaStatus);
+        this.cnpj = cnpj;
+        this.razaoSocial = razaoSocial;
+    }
+
+    public PessoaJuridica(String cnpj, String razaoSocial) {
+        this.cnpj = cnpj;
+        this.razaoSocial = razaoSocial;
+    }
 
     public String getCnpj() {
         return cnpj;
