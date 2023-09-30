@@ -13,5 +13,5 @@ public interface PessoaServiceInterface {
     Object getByName(String nome);
 
     List<PessoaFisica> getAllByStatus();
-
+    List<String> getPending() throws Exception;
 }

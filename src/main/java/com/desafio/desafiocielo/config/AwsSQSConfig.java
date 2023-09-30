@@ -4,10 +4,17 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
+import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+import com.amazonaws.services.sqs.model.ReceiveMessageResult;
+import com.desafio.desafiocielo.dtos.PessoaFisicaResponseDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Configuration
 public class AwsSQSConfig {
@@ -22,7 +29,25 @@ public class AwsSQSConfig {
                 ).build();
     }
 
-    public  getMessage() {
+    public List<String> getMessages() {
+        AmazonSQSClient client = getAmazonSQSClient();
+        String queueUrl = client.getQueueUrl("prospect.fifo").getQueueUrl();
 
+        ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl).withMaxNumberOfMessages(10).withVisibilityTimeout(20).withMessageAttributeNames("All");
+
+        ReceiveMessageResult receiveMessageResult = client.receiveMessage(receiveMessageRequest);
+
+        List<Message> messages = receiveMessageResult.getMessages();
+        List<String> receivedMessages = new ArrayList<>();
+
+        for(Message message: messages) {
+            receivedMessages.add(message.getBody());
+        }
+
+        for(String messageBody: receivedMessages) {
+            return Collections.singletonList(messageBody);
+        }
+
+        return null;
     }
 }

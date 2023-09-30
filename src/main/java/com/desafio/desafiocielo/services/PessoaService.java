@@ -1,6 +1,8 @@
 package com.desafio.desafiocielo.services;
 
+import com.amazonaws.services.sqs.model.Message;
 import com.desafio.desafiocielo.config.AwsSNSConfig;
+import com.desafio.desafiocielo.config.AwsSQSConfig;
 import com.desafio.desafiocielo.dtos.*;
 import com.desafio.desafiocielo.models.PessoaFisica;
 import com.desafio.desafiocielo.models.enums.PessoaType;
@@ -29,6 +31,9 @@ public class PessoaService implements PessoaServiceInterface{
     @Autowired
     private AwsSNSConfig awsSNSConfig;
 
+    @Autowired
+    private AwsSQSConfig awsSQSConfig;
+
     public String cadastrarPessoaFisica(PessoaFisicaDto pessoaFisica) throws Exception {
         if(!pessoaFisica.getTipo().equals(PessoaType.PESSOA_FISICA.label)) {
             return "tipo inválido";
@@ -45,13 +50,6 @@ public class PessoaService implements PessoaServiceInterface{
 
         awsSNSConfig.publishSNS(pessoaSNS);
         return "cadastrado com sucesso";
-    }
-
-    public Object toJson(Object value) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(value);
-
-        return json;
     }
 
     public PessoaFisicaResponseDto criaPessoaFisicaDb(PessoaFisicaDto pessoaFisicaDto) {
@@ -94,5 +92,26 @@ public class PessoaService implements PessoaServiceInterface{
         }
 
         return lista;
+    }
+
+    public List<String> getPending() throws Exception{
+        List<String> messagesList = awsSQSConfig.getMessages();
+        PessoaSNS pessoaSNS = new PessoaSNS();
+        System.out.println(messagesList.get(0));
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            PessoaSQS pessoaSNS1 = objectMapper.readValue(messagesList.get(0), PessoaSQS.class);
+            System.out.println(pessoaSNS1);
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return messagesList;
+    }
+
+    public Object toJson(Object value) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(value);
+
+        return json;
     }
 }

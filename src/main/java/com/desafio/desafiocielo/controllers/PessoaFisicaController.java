@@ -56,7 +56,12 @@ public class PessoaFisicaController {
     }
 
     @GetMapping("/pending")
-    public ResponseEntity<Object> getAllPending() {
+    public ResponseEntity<List<String>> getAllPending() {
+        try {
+            return new ResponseEntity<>(pessoa.getPending(), HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
         return null;
     }
 
